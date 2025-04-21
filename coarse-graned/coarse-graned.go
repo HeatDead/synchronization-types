@@ -6,14 +6,19 @@ import (
 )
 
 type Wallet struct {
+	mu      sync.Mutex
 	balance int
 }
 
 func (w *Wallet) Deposit(amount int) {
+	w.mu.Lock()
+	defer w.mu.Unlock()
 	w.balance += amount
 }
 
 func (w *Wallet) Balance() int {
+	w.mu.Lock()
+	defer w.mu.Unlock()
 	return w.balance
 }
 
@@ -21,7 +26,7 @@ func main() {
 	wallet := &Wallet{}
 	var wg sync.WaitGroup
 
-	// Запускаем 1000 горутин, которые вносят по 1 монете
+	// Те же 1000 горутин
 	for i := 0; i < 1000; i++ {
 		wg.Add(1)
 		go func() {
